@@ -6,3 +6,4 @@ scikit-learn
 xgboost
 matplotlib
 pytest
+seaborn
