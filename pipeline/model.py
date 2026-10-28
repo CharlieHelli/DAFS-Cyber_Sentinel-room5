@@ -33,5 +33,16 @@ def train_model(X_train, y_train, preproc, seed: int = 42):
         use_label_encoder=False
     )
     pipe = Pipeline([("preproc", preproc), ("model", clf)])
+
+    # Define the hyperparameter values to compare.
+    # GridSearchCV will test every possible combination.
+    param_grid = {
+        "model__n_estimators": [100, 200, 300, 500],
+        "model__max_depth": [3, 4, 6],
+        "model__learning_rate": [0.03, 0.05, 0.08, 0.1],
+        "model__subsample": [0.8, 1.0],
+        "model__colsample_bytree": [0.8, 1.0],
+    }
+
     pipe.fit(X_train, y_train)
     return pipe
