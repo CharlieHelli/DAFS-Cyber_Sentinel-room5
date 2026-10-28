@@ -1,5 +1,5 @@
-from typing import Optional
 from xgboost import XGBClassifier
+from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from sklearn.pipeline import Pipeline
 import numpy as np
 
@@ -33,5 +33,43 @@ def train_model(X_train, y_train, preproc, seed: int = 42):
         use_label_encoder=False
     )
     pipe = Pipeline([("preproc", preproc), ("model", clf)])
-    pipe.fit(X_train, y_train)
-    return pipe
+
+    # Define the hyperparameter values to compare.
+    # GridSearchCV will test every possible combination.
+    param_grid = {
+        "model__n_estimators": [100, 200, 300, 500],
+        "model__max_depth": [3, 4, 6],
+        "model__learning_rate": [0.03, 0.05, 0.08, 0.1],
+        "model__subsample": [0.8, 1.0],
+        "model__colsample_bytree": [0.8, 1.0],
+    }
+
+    # Split training data into 3 folds for cross-validation.
+    # Each fold takes a turn being used for validation.
+    cv = StratifiedKFold(
+        n_splits=3,
+        shuffle=True,
+        random_state=seed,
+    )
+
+    
+    # Search for the best hyperparameter combination.
+    search = GridSearchCV(
+        estimator=pipe,
+        param_grid=param_grid,
+        scoring="recall",
+        cv=cv,
+        n_jobs=-1,
+        refit=True,
+        verbose=1,
+    )
+
+    # Train and evaluate each parameter combination.
+    search.fit(X_train, y_train)
+
+    # Display the best results from cross-validation.
+    print("Best cross-validation recall:", round(search.best_score_, 3))
+    print("Best hyperparameters:", search.best_params_)
+
+    # Return the best fitted pipeline.
+    return search.best_estimator_
