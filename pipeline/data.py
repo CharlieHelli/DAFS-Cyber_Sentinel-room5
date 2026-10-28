@@ -19,9 +19,18 @@ def load_data(path: str = "data/train_data.csv") -> pd.DataFrame:
         raise ValueError(f"CSV missing target column '{TARGET_COL}'")
 
     # Normalize target → binary 0/1
-    mapping = {"anomaly": 1, "normal": 0}
-    if df[TARGET_COL].dtype == object:
-        df[TARGET_COL] = df[TARGET_COL].map(mapping)
+    table_de_correspondance = {
+    "normal" : 0,
+    "anomaly": 1
+    }
+    df[TARGET_COL] = df[TARGET_COL].replace(to_replace=table_de_correspondance)
+    
+    # Conversion de la colonne en booléen
+    df[TARGET_COL] = df[TARGET_COL].astype(int).astype(bool)
+    # mapping = {"anomaly": 1, "normal": 0}
+    # if df[TARGET_COL].dtype == object:
+    #     df[TARGET_COL] = df[TARGET_COL].map(mapping)
+
     # If already numeric, assume 0/1
     if not set(df[TARGET_COL].unique()).issubset({0, 1}):
         raise ValueError("Target must be 'normal'/'anomaly' or 0/1 after mapping.")
