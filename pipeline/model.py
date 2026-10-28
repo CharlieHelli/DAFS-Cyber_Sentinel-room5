@@ -44,5 +44,13 @@ def train_model(X_train, y_train, preproc, seed: int = 42):
         "model__colsample_bytree": [0.8, 1.0],
     }
 
+    # Split training data into 3 folds for cross-validation.
+    # Each fold takes a turn being used for validation.
+    cv = StratifiedKFold(
+        n_splits=3,
+        shuffle=True,
+        random_state=seed,
+    )
+
     pipe.fit(X_train, y_train)
     return pipe
