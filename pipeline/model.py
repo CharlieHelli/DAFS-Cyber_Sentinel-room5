@@ -1,5 +1,5 @@
-from typing import Optional
 from xgboost import XGBClassifier
+from sklearn.model_selection import GridSearchCV, StratifiedKFold
 from sklearn.pipeline import Pipeline
 import numpy as np
 
