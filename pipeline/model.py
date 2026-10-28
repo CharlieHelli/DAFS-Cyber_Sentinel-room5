@@ -52,5 +52,24 @@ def train_model(X_train, y_train, preproc, seed: int = 42):
         random_state=seed,
     )
 
-    pipe.fit(X_train, y_train)
-    return pipe
+    
+    # Search for the best hyperparameter combination.
+    search = GridSearchCV(
+        estimator=pipe,
+        param_grid=param_grid,
+        scoring="recall",
+        cv=cv,
+        n_jobs=-1,
+        refit=True,
+        verbose=1,
+    )
+
+    # Train and evaluate each parameter combination.
+    search.fit(X_train, y_train)
+
+    # Display the best results from cross-validation.
+    print("Best cross-validation recall:", round(search.best_score_, 3))
+    print("Best hyperparameters:", search.best_params_)
+
+    # Return the best fitted pipeline.
+    return search.best_estimator_
